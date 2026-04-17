@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -12,6 +12,17 @@ export default function Navbar({ onMenuToggle, isMobileMenuOpen }: NavbarProps) 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
   const location = useLocation();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCollectionsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -84,10 +95,9 @@ export default function Navbar({ onMenuToggle, isMobileMenuOpen }: NavbarProps) 
             ))}
             
             {/* Collections Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsCollectionsOpen(!isCollectionsOpen)}
-                onBlur={() => setTimeout(() => setIsCollectionsOpen(false), 150)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1 ${
                   isCollectionsActive()
                     ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
@@ -110,6 +120,7 @@ export default function Navbar({ onMenuToggle, isMobileMenuOpen }: NavbarProps) 
                         <Link
                           key={link.path}
                           to={link.path}
+                          onClick={() => setIsCollectionsOpen(false)}
                           className={`block px-4 py-2 text-sm transition-colors ${
                             isActive(link.path)
                               ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
