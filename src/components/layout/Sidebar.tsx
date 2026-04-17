@@ -11,7 +11,7 @@ interface SidebarProps {
   sections: SectionLink[];
 }
 
-export default function Sidebar({ title, sections }: SidebarProps) {
+export default function Sidebar({ sections }: SidebarProps) {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string>('');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
